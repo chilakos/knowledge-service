@@ -6,6 +6,10 @@ RBC Assist knowledge service. Architecture decision records and diagrams for gro
 |---|---|
 | [ADR-020: On-prem RAG grounding via OneLake shortcuts](docs/adr/ADR-020-onprem-rag-grounding-via-onelake-shortcuts.md) | Proposed (Rev 2), conditional on decision gate G1–G7 |
 
+## Review site
+
+Rendered ADR with diagrams: https://chilakos.github.io/knowledge-service/
+
 ## Diagrams
 
 - `docs/adr/diagrams/02-target-architecture.png`: target architecture (editable SVG alongside)
