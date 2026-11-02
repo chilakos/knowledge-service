@@ -86,7 +86,7 @@
 <text x="500" y="995" text-anchor="middle" font-weight="bold" fill="#042C53">RBC Assist</text>
 <text x="500" y="1015" text-anchor="middle" font-size="12" fill="#185FA5">MCP client</text>
 <rect x="700" y="970" width="240" height="60" rx="6" fill="#fff" stroke="#185FA5"/>
-<text x="820" y="995" text-anchor="middle" font-weight="bold" fill="#042C53">Luminate Data Gateway</text>
+<text x="820" y="995" text-anchor="middle" font-weight="bold" fill="#042C53">Lumina Data Gateway</text>
 <text x="820" y="1015" text-anchor="middle" font-size="12" fill="#185FA5">ADR-015 trust boundary</text>
 <line x1="300" y1="1000" x2="378" y2="1000" stroke="#444" stroke-width="1.5" marker-end="url(#a)"/>
 <line x1="620" y1="1000" x2="698" y2="1000" stroke="#444" stroke-width="1.5" marker-end="url(#a)"/>
