@@ -6,7 +6,7 @@
 | **Date** | 2026-09-15 |
 | **Decider** | George Chilakos, Senior Director, Enterprise Data Platforms |
 | **Consulted** | Solution architect (RAG service), Platform Engineering, Information Security, Data Governance |
-| **Related ADRs** | ADR-010/011 (Fabric as BI/AI semantic surface), ADR-015 (Luminate Data Gateway as trust boundary for agentic traffic) |
+| **Related ADRs** | ADR-010/011 (Fabric as BI/AI semantic surface), ADR-015 (Lumina Data Gateway as trust boundary for agentic traffic) |
 | **Supersedes** | Current manual AWS CLI copy process for RAG grounding data |
 | **Revision** | Rev 2 (2026-09-15): corrected Content Understanding skill details (billing, file input, analyzer selection); added OCR model-configurability analysis and selective vision-model routing |
 | **Diagrams** | PNG images in `diagrams/` (editable SVG for the target architecture); Mermaid source under each image |
@@ -83,7 +83,7 @@ The Azure AI Search OneLake files indexer's documented list of supported shortcu
 
 ## 3. Decision
 
-Adopt **Option 3**. RBC Assist will be grounded on on-prem S3-compatible content through a **OneLake S3-compatible shortcut routed through the Fabric on-premises data gateway**. The **Azure AI Search OneLake files indexer** will index it, using a skillset built on the **Azure Content Understanding skill** for extraction, OCR and chunking. Pages the skill handles poorly (handwriting, dense or degraded scans) are **selectively routed to a vision-capable chat model through the GenAI Prompt skill**. Chunks are vectorized with an **Azure OpenAI** embedding model. The results are published through an **AI Search knowledge base MCP endpoint** and reached by Assist **through the Luminate Data Gateway** (ADR-015).
+Adopt **Option 3**. RBC Assist will be grounded on on-prem S3-compatible content through a **OneLake S3-compatible shortcut routed through the Fabric on-premises data gateway**. The **Azure AI Search OneLake files indexer** will index it, using a skillset built on the **Azure Content Understanding skill** for extraction, OCR and chunking. Pages the skill handles poorly (handwriting, dense or degraded scans) are **selectively routed to a vision-capable chat model through the GenAI Prompt skill**. Chunks are vectorized with an **Azure OpenAI** embedding model. The results are published through an **AI Search knowledge base MCP endpoint** and reached by Assist **through the Lumina Data Gateway** (ADR-015).
 
 Adoption is conditional on the [decision gate](#6-decision-gate). If the gate fails, implement **Option 2** with the same downstream design.
 
@@ -141,7 +141,7 @@ flowchart TB
     subgraph CONSUME["Consumption"]
         U["RBC users<br/>Entra ID sign-in"]
         A["RBC Assist<br/>MCP client"]
-        LDG["Luminate Data Gateway<br/>ADR-015 trust boundary"]
+        LDG["Lumina Data Gateway<br/>ADR-015 trust boundary"]
     end
 
     U --> A --> LDG
@@ -162,7 +162,7 @@ sequenceDiagram
     autonumber
     actor User as RBC user
     participant Assist as RBC Assist
-    participant LDG as Luminate Data Gateway (ADR-015)
+    participant LDG as Lumina Data Gateway (ADR-015)
     participant KB as AI Search knowledge base (MCP)
     participant IDX as Search index
     User->>Assist: Ask a question (Entra ID session)
@@ -195,7 +195,7 @@ sequenceDiagram
 | Azure OpenAI embedding deployment | Vectorizes chunks | Same model used at query time |
 | Search index | Stores chunks, vectors, metadata and permission fields | Hybrid search; permission field is filterable |
 | Knowledge base / MCP endpoint | Retrieval interface for agents | Unchanged contract for Assist |
-| Luminate Data Gateway | Trust boundary for all agentic traffic (ADR-015) | On-behalf-of token pass-through; user-scoped tool discovery |
+| Lumina Data Gateway | Trust boundary for all agentic traffic (ADR-015) | On-behalf-of token pass-through; user-scoped tool discovery |
 | Deletion reconciliation job | Removes index entries for deleted source files | Scheduled Fabric notebook; compares listings only |
 
 ---
@@ -219,7 +219,7 @@ sequenceDiagram
 ### 5.2 Query flow
 
 1. A user asks RBC Assist a question in an Entra ID–authenticated session.
-2. Assist calls the retrieval tool over MCP. **Per ADR-015, the call goes through the Luminate Data Gateway**, which validates the token, applies policy and passes an on-behalf-of token downstream.
+2. Assist calls the retrieval tool over MCP. **Per ADR-015, the call goes through the Lumina Data Gateway**, which validates the token, applies policy and passes an on-behalf-of token downstream.
 3. The AI Search knowledge base runs a hybrid query (keyword + vector) against the index, filtered by the user's permissions.
 4. Permitted chunks come back with citations, and Assist generates a grounded answer.
 
@@ -253,7 +253,7 @@ Option 3 is adopted only if **all** of the following are confirmed, in writing f
 - **AI Search to OneLake:** system- or user-assigned managed identity with at least the **Contributor** role on the Fabric workspace. The AI Search service must be in the **same Entra tenant** as the Fabric workspace.
 - **OneLake to storage:** the S3 access key is held in the shortcut's gateway connection. Only users with permission on that connection can create shortcuts with it.
 - **Tenant setting:** "Allow apps running outside of Fabric to access data via OneLake" must be enabled, because AI Search is an external app.
-- **Assist to retrieval:** Entra ID user token → Luminate Data Gateway → on-behalf-of token → knowledge base (ADR-015).
+- **Assist to retrieval:** Entra ID user token → Lumina Data Gateway → on-behalf-of token → knowledge base (ADR-015).
 
 ### 7.2 Document-level security
 
@@ -557,7 +557,7 @@ Other relevant capabilities:
 | **1. Connect** | Deploy gateway cluster; create S3-compatible shortcut in a dev lakehouse; enable the external-app OneLake tenant setting | Files visible in lakehouse `Files`; latency baseline captured |
 | **2. Index** | Create data source (`type: onelake`), index, indexer and skillset (Content Understanding + embedding) on a representative sample | Successful incremental run; change detection verified |
 | **3. Extraction quality** | Validate the file handoff (G6); run the comparison test in §7.6.6; define and tune the routing signals | G6 and G7 pass; routed-page share and cost per 1,000 pages within budget |
-| **4. Security** | Permission fields populated; query-time filtering through the Luminate Data Gateway on-behalf-of flow | Negative tests pass (users can't retrieve unpermitted content) |
+| **4. Security** | Permission fields populated; query-time filtering through the Lumina Data Gateway on-behalf-of flow | Negative tests pass (users can't retrieve unpermitted content) |
 | **5. Operations** | Reconciliation job, monitoring (indexer status, gateway health, skill errors), cost telemetry | Runbook approved |
 | **6. Scale** | Batched initial load of the full corpus; production schedule | Throughput meets service levels (G3); Assist switched to the new index |
 | **7. Decommission** | Retire the manual CLI process and the legacy storage account copy | Legacy copy deleted; ADR status → Accepted |
@@ -567,7 +567,7 @@ Other relevant capabilities:
 ## 11. Open questions
 
 1. Is the on-prem RAG content in the same S3-compatible platform as the lakehouse object storage, or a separate store?
-2. Does Assist today call the AI Search MCP endpoint directly, and what change is needed to route it through the Luminate Data Gateway?
+2. Does Assist today call the AI Search MCP endpoint directly, and what change is needed to route it through the Lumina Data Gateway?
 3. What is the authoritative source of document-level permissions for this content?
 4. Which content classes, if any, are barred from producing derived content in Azure (and so need Option 4)?
 5. What initial corpus size and daily change volume should the gateway be sized for?
